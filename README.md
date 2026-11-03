@@ -40,56 +40,6 @@ reader/
 
 ---
 
-## 部署到 GitHub Pages
-
-仓库已经叫 `reader`，把这个文件夹里的**全部文件**推到仓库根目录：
-
-```bash
-cd ~/Desktop/reader
-git init
-git add .
-git commit -m "北海阅读器 2.0"
-git branch -M main
-git remote add origin https://github.com/<你的用户名>/reader.git
-git push -u origin main
-```
-
-然后在仓库页面：**Settings → Pages → Build and deployment**
-- Source 选 `Deploy from a branch`
-- Branch 选 `main`，目录选 `/ (root)`，保存
-
-等一两分钟，访问：
-
-```
-https://<你的用户名>.github.io/reader/
-```
-
-> 必须用 HTTPS 访问，`file://` 直接打开时不会注册 Service Worker（也不影响阅读）。
-
----
-
-## 装到手机
-
-**Android / Chrome**：打开上面的网址 → 右上角菜单 → 「安装应用」或「添加到主屏幕」。
-
-**iPhone / Safari**：打开网址 → 底部分享按钮 → 「添加到主屏幕」。iOS 没有安装提示，必须手动加。
-
-装好后从主屏图标启动，没有浏览器地址栏，和普通 App 一样。
-
----
-
-## 更新版本
-
-改完 `index.html` 后，**一定要同时改 `sw.js` 里的版本号**，否则手机还会用旧缓存：
-
-```js
-const VERSION = '2.0.1';   // 每次发版 +1
-```
-
-同时建议在 `manifest.json` 的 `name` 里同步改版本字样。推送后，用户第一次打开页面会先联网拿到新版，关掉再开即生效。
-
----
-
 ## 数据存在哪
 
 书籍、书架、封面、阅读进度都保存在**浏览器本地**（IndexedDB + localStorage），不上传任何服务器。
@@ -103,16 +53,6 @@ const VERSION = '2.0.1';   // 每次发版 +1
 | 上次阅读 | localStorage `qingread.last.v1` | 下次打开自动续读 |
 
 **注意**：同一域名下换路径（例如以后改仓库名）数据不通用；不同浏览器、不同设备之间也不互通。
-
-### 从桌面单文件版迁移过来
-
-网页版和 `file://` 版的存储是隔离的，书不会自动带过来。搬法：
-
-1. 桌面版里进「书架管理」→「导出本架为 ZIP」（混杂格式时只会打包 TXT）
-2. 解压得到一堆 `.txt` / `.epub`
-3. 在网页版里：TXT 可多选一次导入 10 本，EPUB 单本导入
-
-阅读进度、书签和封面都不会跟着走，只迁书。
 
 ---
 
