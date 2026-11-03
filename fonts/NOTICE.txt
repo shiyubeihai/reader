@@ -1,0 +1,33 @@
+北海阅读器 内置字体说明
+========================
+
+本目录下的 .woff2 是按字符集裁剪后的子集字体，均遵循 SIL Open Font License 1.1。
+完整许可证文本见同目录 OFL.txt。
+
+1. 宋体（BHSerif）
+   源字体：思源宋体 Source Han Serif SC, Regular
+   版权：Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+   许可：SIL Open Font License 1.1
+
+2. 黑体（BHSans）
+   源字体：思源黑体 Source Han Sans SC, Regular
+   版权：Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+   许可：SIL Open Font License 1.1
+
+3. 圆体（BHRound）
+   源字体：江城圆体 JiangCheng YuanTi 400W（基于思源黑体派生）
+   版权：Copyright 江城圆体原作者；源流为 Source Han Sans (Adobe)
+   许可：SIL Open Font License 1.1
+
+裁剪方式
+--------
+用 harfbuzz 的 hb-subset 按字符集裁剪，再用 WOFF2 压缩。字符集包含：
+
+- GB2312 一级汉字 3755 字
+- 繁简转换表涉及的全部繁体字（约 1140 字）
+- 基本拉丁与拉丁扩展 A/B（西文变音，法/意/德）
+- 西里尔字母（俄文）
+- 通用标点、CJK 标点、全角符号
+
+每个字族拆成 3 个分片（unicode-range 划分），浏览器按需下载。
+未收录的生僻字会回退到系统字体。

@@ -1,6 +1,6 @@
 {
   "id": "./",
-  "name": "北海阅读器 1.0",
+  "name": "北海阅读器 2.0",
   "short_name": "北海阅读器",
   "description": "TXT / EPUB / HTML 本地阅读器，支持竖排、繁简互换、多书架、阅读计时。单文件、离线可用。",
   "lang": "zh-CN",
@@ -8,11 +8,18 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "any",
   "background_color": "#E8F0F7",
   "theme_color": "#12314F",
-  "categories": ["books", "productivity", "utilities"],
+  "categories": [
+    "books",
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "./icons/icon-192.png",

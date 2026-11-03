@@ -1,14 +1,17 @@
-# 北海阅读器 1.0
+# 北海阅读器 2.0
 
 单文件网页阅读器，可装到手机主屏当 App 用（PWA）。整个应用只有 HTML + 几个图标，没有后端、没有外部字体、没有 CDN。
 
-- **格式**：TXT（UTF-8 / UTF-16 / GBK 自动识别）、EPUB 2/3、HTML
-- **排版**：横排 / 竖排（竖版 EPUB 自动识别），字号、行距、页边距可调
+- **格式**：TXT（自动识别 UTF-8 / UTF-16 / GBK / Big5 / Shift_JIS / EUC-KR / Windows-1251 / KOI8-R）、EPUB 2/3、DOCX、HTML
+- **排版**：横排 / 竖排（竖版 EPUB 自动识别），字号、行距、页边距、页面亮度可调
 - **字形**：繁体 / 简体三态切换，内置约 700 字常用对照表
-- **字体**：自动探测本机已装的中文字体，只列出真实可用的；也可上传本机字体文件
-- **纸张**：宣纸 / 麻黄 / 白纸 / 道林 / 羊皮 / 木纹 / 大理石浅 / 大理石深，另有自定义背景图
-- **书架**：最多 12 个，每个 60MB，可命名、改名、删除、跨架移动
-- **导入导出**：TXT 可批量导入（一次 ≤10 本），EPUB 单本；单本导出 TXT / EPUB，整架打包 ZIP
+- **字体**：内嵌思源宋体 / 思源黑体 / 江城圆体（SIL OFL 1.1，子集约 5MB），不依赖系统字体；另外也会列出本机已装的中文字体，可上传字体文件
+- **纸张**：宣纸 / 麻黄 / 白纸 / 碧水 / 涟漪 / 冰裂 / 叶纸 / 大理石深，另有自定义背景图
+- **书架**：最多 8 个，每个 600MB，可命名、改名、删除、跨架移动；列表 / 网格两种排列，网格一行 4–5 本
+- **封面**：每本书可单独上传封面图（≤1MB，自动压到 480×640）
+- **编辑**：TXT 书籍可直接在应用内改正文，保存后自动重新分章
+- **导入导出**：TXT / HTML / DOCX 可批量导入（一次 ≤10 本），EPUB 单本；单本导出 TXT / EPUB，整架打包 ZIP
+- **备份**：整库导出为单个 JSON（书架 + 书 + 封面 + 进度），可合并恢复；超过 200MB 会先提醒
 - **阅读计时**：显示已读时长，每 30 分钟提醒休息
 
 ---
@@ -18,13 +21,19 @@
 ```
 reader/
 ├── index.html              应用本体（全部逻辑与样式）
-├── manifest.json             PWA 清单
+├── manifest.json           PWA 清单
 ├── sw.js                   Service Worker（离线缓存）
 ├── icons/
 │   ├── icon-192.png
 │   ├── icon-512.png
 │   ├── icon-maskable-512.png
 │   └── apple-touch-icon.png
+├── fonts/
+│   ├── serif-1..3.woff2     思源宋体（子集，分 3 片）
+│   ├── sans-1..3.woff2      思源黑体
+│   ├── round-1..3.woff2     江城圆体
+│   ├── NOTICE.txt           字体来源与裁剪说明
+│   └── OFL.txt              SIL Open Font License 1.1
 ├── .nojekyll               让 GitHub Pages 原样发布，不做 Jekyll 处理
 └── README.md
 ```
@@ -39,7 +48,7 @@ reader/
 cd ~/Desktop/reader
 git init
 git add .
-git commit -m "北海阅读器 1.0"
+git commit -m "北海阅读器 2.0"
 git branch -M main
 git remote add origin https://github.com/<你的用户名>/reader.git
 git push -u origin main
@@ -74,21 +83,22 @@ https://<你的用户名>.github.io/reader/
 改完 `index.html` 后，**一定要同时改 `sw.js` 里的版本号**，否则手机还会用旧缓存：
 
 ```js
-const VERSION = '1.0.1';   // 每次发版 +1
+const VERSION = '2.0.1';   // 每次发版 +1
 ```
 
-同时建议在 `manifest.webmanifest` 的 `name` 里同步改版本字样。推送后，用户第一次打开页面会先联网拿到新版，关掉再开即生效。
+同时建议在 `manifest.json` 的 `name` 里同步改版本字样。推送后，用户第一次打开页面会先联网拿到新版，关掉再开即生效。
 
 ---
 
 ## 数据存在哪
 
-书籍、书架、阅读进度都保存在**浏览器本地**（IndexedDB + localStorage），不上传任何服务器。
+书籍、书架、封面、阅读进度都保存在**浏览器本地**（IndexedDB + localStorage），不上传任何服务器。
 
 | 项 | 位置 | 说明 |
 |---|---|---|
 | 书籍与书架 | IndexedDB `qingread` | 换设备、清缓存都会丢 |
-| 阅读设置 | localStorage `qingread.cfg.v1` | 字体、字号、背景、颜色 |
+| 封面 | IndexedDB `covers` | 单独存，避免书架列表把图片全读一遍 |
+| 阅读设置 | localStorage `qingread.cfg.v1` | 字体、字号、背景、颜色、排列方式 |
 | 当前书架 | localStorage `qingread.shelf.v1` | |
 | 上次阅读 | localStorage `qingread.last.v1` | 下次打开自动续读 |
 
@@ -102,17 +112,22 @@ const VERSION = '1.0.1';   // 每次发版 +1
 2. 解压得到一堆 `.txt` / `.epub`
 3. 在网页版里：TXT 可多选一次导入 10 本，EPUB 单本导入
 
-阅读进度和书签不会跟着走，只迁书。
+阅读进度、书签和封面都不会跟着走，只迁书。
 
 ---
 
 ## 已知限制
 
-- EPUB 里的图片会被丢弃，只保留文字与段落结构
+- EPUB / DOCX 里的图片会被丢弃，只保留文字与段落结构
+- DOCX 只读正文段落与标题样式，字体、表格边框、页眉页脚都不保留
+- 应用内编辑只支持 TXT；保存会重新分章，进度与书签重置
 - 繁简转换是常用字表，不是完整 OpenCC；一简对多繁处取常用项（干 → 幹、发 → 發）
 - 竖排时分章按字数切块（单章上限 9000 字），目录里可能出现「第 X 章（2）」这样的续段
-- 单个书架上限 60MB，按原始文件大小计
-- 页面用到的 `DecompressionStream` 需要较新的浏览器（Chrome 103+ / Safari 16.4+），旧浏览器打不开 EPUB
+- 单个书架上限 600MB，按原始文件大小计；封面不计入
+- 整库备份会把正文与封面都塞进一个 JSON，库很大时手机内存可能吃紧
+- 页面用到的 `DecompressionStream` 需要较新的浏览器（Chrome 103+ / Safari 16.4+），旧浏览器打不开 EPUB / DOCX
+- 内嵌字体是子集：GB2312 一级 3755 字 + 繁简表繁体字 + 拉丁扩展 + 西里尔 + 常用标点。**超出范围的生僻字会回退到系统字体**
+- 首次打开要下载约 5MB 字体（三个字族各 3 片，浏览器按需加载），之后由 Service Worker 缓存
 
 ---
 

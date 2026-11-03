@@ -3,7 +3,7 @@
  * 改了 index.html / 图标 / manifest 之后，必须把 VERSION 改掉，
  * 否则浏览器会一直用旧缓存。
  */
-const VERSION = '1.0.2';
+const VERSION = '2.1.2';
 const CACHE = 'beihai-reader-' + VERSION;
 
 const ASSETS = [
@@ -13,7 +13,16 @@ const ASSETS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
-  './icons/apple-touch-icon.png'
+  './icons/apple-touch-icon.png',
+  './fonts/serif-1.woff2',
+  './fonts/serif-2.woff2',
+  './fonts/serif-3.woff2',
+  './fonts/sans-1.woff2',
+  './fonts/sans-2.woff2',
+  './fonts/sans-3.woff2',
+  './fonts/round-1.woff2',
+  './fonts/round-2.woff2',
+  './fonts/round-3.woff2'
 ];
 
 self.addEventListener('install', (event) => {
