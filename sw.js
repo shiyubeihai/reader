@@ -1,10 +1,10 @@
-/* 北海阅读器 1.0 — Service Worker
+/* 北冥有鱼 1.0 — Service Worker
  *
  * 改了 index.html / 图标 / manifest 之后，必须把 VERSION 改掉，
  * 否则浏览器会一直用旧缓存。
  */
-const VERSION = '2.1.2';
-const CACHE = 'beihai-reader-' + VERSION;
+const VERSION = '2.2.1';
+const CACHE = 'beiming-reader-' + VERSION;
 
 const ASSETS = [
   './',
