@@ -1,6 +1,8 @@
 # 北冥有鱼 1.0
 
-单文件网页阅读器，可装到手机主屏当 App 用（PWA）。整个应用只有 HTML + 几个图标，没有后端、没有外部字体、没有 CDN。
+单文件网页阅读器，可装到手机主屏当 App 用（PWA）。只有 HTML + 图标，没有外部字体、没有 CDN。
+
+当前版本：v2.2.4（2026-11-12） 
 
 - **格式**：TXT（自动识别 UTF-8 / UTF-16 / GBK / Big5 / Shift_JIS / EUC-KR / Windows-1251 / KOI8-R）、EPUB 2/3、MOBI6（PalmDOC，无 DRM）、DOCX、HTML
 - **排版**：横排 / 竖排（竖版 EPUB 自动识别），字号、行距、页边距、页面亮度可调
@@ -16,6 +18,30 @@
 - **阅读日历**：按天累计阅读时长（`qingread.days.v1`），书架右上角进入，可翻月查看
   - 每格显示农历日（初一显示月名）或当天最高优先级标注；点开单日看农历全文、年/月/日干支、全部标注
   - 标注数据：77 条固定条目 + 24 节气；农历与干支覆盖 **1900-01-31 至 2100 年**，翻月到边界自动禁用
+
+---
+
+## 更新日志
+
+### v2.2.4（2026-11-12）
+- 书架底部新增「Support · 请我喝杯柠檬水」链接
+
+### v2.2.3（2026-11-12）
+- 网格视图：每本书封面左上角标注文件类型（TXT / EPUB / MOBI / DOCX / HTML）
+- 书籍菜单新增「重命名」，导入后可随时改书名
+- 书架标题与副标题的间距从 9px 调到 18px
+
+### v2.2.2（2026-11-12）
+- 修复部分 MOBI 书名显示为方框：书名与作者改为严格编码探测（UTF-8 → GB18030 → Big5 → UTF-16）
+- 注意：修复前导入的乱码书名，需要重新导入或手动改名
+
+### v2.2.1（2026-11-05）
+- 修复 MOBI 书名、作者的编码识别
+- 增加 KF8 双格式检测，打开时提示「将按旧格式打开」
+
+### v2.2.0（2026-11-05）
+- 新增 MOBI6 支持（PalmDOC 压缩，无 DRM）
+- 格式扩到五种：TXT / EPUB / MOBI / DOCX / HTML
 
 ---
 
@@ -42,30 +68,6 @@ reader/
 ```
 
 ---
-
-## 部署到 GitHub Pages
-
-仓库已经叫 `reader`，把这个文件夹里的**全部文件**推到仓库根目录：
-
-```bash
-cd ~/Desktop/reader
-git init
-git add .
-git commit -m "北冥有鱼 1.0"
-git branch -M main
-git remote add origin https://github.com/<你的用户名>/reader.git
-git push -u origin main
-```
-
-然后在仓库页面：**Settings → Pages → Build and deployment**
-- Source 选 `Deploy from a branch`
-- Branch 选 `main`，目录选 `/ (root)`，保存
-
-等一两分钟，访问：
-
-```
-https://<你的用户名>.github.io/reader/
-```
 
 > 必须用 HTTPS 访问，`file://` 直接打开时不会注册 Service Worker（也不影响阅读）。
 
