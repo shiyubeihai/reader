@@ -157,6 +157,8 @@ body.ui-on #bottombar{transform:translateY(0)}
 }
 #brand b{display:block;font-size:11.5px;font-weight:600;letter-spacing:.26em;color:#fff;opacity:.9}
 #brand span{display:block;font-size:10.5px;letter-spacing:.22em;color:rgba(255,255,255,.45);margin-top:2px}
+#brand .sup{display:inline-block;margin-top:7px;font-size:10.5px;letter-spacing:.1em;color:rgba(255,255,255,.52);text-decoration:none;border-bottom:1px dashed rgba(255,255,255,.26);padding:2px 2px 1px}
+#brand .sup:active{color:#fff;border-bottom-color:rgba(255,255,255,.5)}
 #slider{flex:1;height:22px;-webkit-appearance:none;appearance:none;background:none}
 #slider::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:rgba(18,49,79,.16)}
 #slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--blue);margin-top:-5.5px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
@@ -247,7 +249,7 @@ body.ui-on #bottombar{transform:translateY(0)}
 #shelf > *{flex:0 0 auto}
 #shelf.off{display:none}
 #shelf h1{font-size:20px;margin:0 0 3px;font-weight:600;letter-spacing:.08em;color:#fff}
-#shelf .sub2{font-size:11.5px;margin-top:9px;margin-bottom:0;color:rgba(255,255,255,.55);letter-spacing:.04em}
+#shelf .sub2{font-size:11.5px;margin-top:18px;margin-bottom:0;color:rgba(255,255,255,.55);letter-spacing:.04em}
 .sheadwrap{
   margin:calc(-1 * (env(safe-area-inset-top,0px) + 18px)) -14px 18px;
   padding:calc(env(safe-area-inset-top,0px) + 14px) 14px 22px;
@@ -345,6 +347,9 @@ body.view-grid #bgrid{display:grid}
   background:linear-gradient(rgba(10,24,40,0),rgba(10,24,40,.58));
   color:#fff;font-size:10px;line-height:1.2;letter-spacing:.06em;text-align:center;
   text-shadow:0 1px 2px rgba(0,0,0,.40);white-space:nowrap;overflow:hidden}
+.gtype{position:absolute;left:3px;top:3px;padding:1px 5px;border-radius:4px;
+  background:rgba(10,24,40,.62);color:#fff;font-size:8.5px;line-height:1.5;
+  letter-spacing:.06em;font-weight:600}
 .gmore{position:absolute;right:2px;top:2px;width:22px;height:22px;border-radius:50%;
   background:rgba(10,24,40,.45);color:#fff;font-size:13px;line-height:22px;text-align:center;opacity:.8}
 .gtitle{margin-top:6px;font-size:11px;line-height:1.35;height:2.7em;overflow:hidden;color:#22323F;word-break:break-all}
@@ -547,7 +552,7 @@ body.view-grid #bgrid{display:grid}
   <div id="blist"></div>
   <div id="bgrid"></div>
   <div id="shelfEmpty" class="empty2" style="display:none">这个书架还没有书<br>点上方按钮导入，或把文件拖进窗口</div>
-  <div id="brand"><b>北冥有鱼</b><span>始于北海 · v1.0</span></div>
+  <div id="brand"><b>北冥有鱼</b><span>始于北海 · v1.0</span><a class="sup" href="https://mbd.pub/o/bread/mbd-YZaWlZxxbQ==" target="_blank" rel="noopener noreferrer">Support · 请我喝杯柠檬水</a></div>
 </div>
 
 <!-- 文本编辑器 -->
@@ -1720,11 +1725,26 @@ function parseMobi(buf){
 
   // 书名 / 作者常与声明的编码不一致（老中文书多为 GBK），依次试解码
   function decodeSmart(bytes){
-    var t = new TextDecoder('utf-8').decode(bytes);
-    if (t.indexOf('�') < 0) return t;
-    try { t = new TextDecoder('gbk').decode(bytes); if (t.indexOf('�') < 0) return t; } catch(e){}
-    try { t = new TextDecoder('big5').decode(bytes); if (t.indexOf('�') < 0) return t; } catch(e){}
-    try { t = new TextDecoder('gb18030').decode(bytes); if (t.indexOf('�') < 0) return t; } catch(e){}
+    function strict(enc){
+      try { return new TextDecoder(enc, { fatal: true }).decode(bytes); } catch(e){ return null; }
+    }
+    // 解码结果是否像正常文字：不含替换字符、私用区、罕见扩展区
+    function sane(s){
+      if (s.indexOf('�') >= 0) return false;
+      var bad = 0;
+      for (var i = 0; i < s.length; i++){
+        var c = s.charCodeAt(i);
+        if ((c >= 0xE000 && c <= 0xF8FF) || (c >= 0x3400 && c <= 0x4DBF) || c >= 0xD800) bad++;
+      }
+      return bad <= s.length * 0.2;
+    }
+    if (bytes.length > 2 && bytes[0] === 0xFF && bytes[1] === 0xFE) return strict('utf-16le') || '';
+    if (bytes.length > 2 && bytes[0] === 0xFE && bytes[1] === 0xFF) return strict('utf-16be') || '';
+    var order = ['utf-8', 'gb18030', 'big5', 'utf-16le'];
+    for (var k = 0; k < order.length; k++){
+      var t = strict(order[k]);
+      if (t !== null && sane(t)) return t;
+    }
     return new TextDecoder('windows-1252').decode(bytes);
   }
 
@@ -2503,6 +2523,11 @@ function makeGridCell(rec, cover){
   cap.textContent = ((rec.name || '书').replace(/\s+/g, '').slice(0, 4)) || '书';
   box.appendChild(cap);
 
+  var tp = document.createElement('div');
+  tp.className = 'gtype';
+  tp.textContent = (rec.type || '').toUpperCase();
+  box.appendChild(tp);
+
   var more = document.createElement('button');
   more.className = 'gmore';
   more.textContent = '⋯';
@@ -2570,6 +2595,7 @@ function newShelf(){
 function bookMenu(rec){
   var items = [];
   if (rec.type === 'txt') items.push({ label: '编辑文本', act: 'edit' });
+  items.push({ label: '重命名', act: 'rename' });
   items.push({ label: '设置封面', act: 'cover' });
   items.push({ label: '移除封面', act: 'nocover' });
   items.push({ label: '导出为 TXT', act: 'txt' });
@@ -2582,6 +2608,15 @@ function bookMenu(rec){
   showChooser(rec.name || '书籍', items, function(it){
     if (it.act === 'txt' || it.act === 'epub'){ exportBook(rec, it.act); return; }
     if (it.act === 'edit'){ openEditor(rec); return; }
+    if (it.act === 'rename'){
+      var nv = prompt('书名', rec.name || '');
+      if (nv === null) return;
+      nv = nv.trim().slice(0, 60);
+      if (!nv || nv === rec.name) return;
+      rec.name = nv;
+      dbPut(rec).then(function(){ toast('已重命名', 1400); renderShelf(); });
+      return;
+    }
     if (it.act === 'cover'){ pickCover(rec); return; }
     if (it.act === 'nocover'){
       dbDelCover(rec.id).then(function(){ toast('封面已移除', 1400); renderShelf(); });
