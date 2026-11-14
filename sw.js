@@ -3,7 +3,7 @@
  * 改了 index.html / 图标 / manifest 之后，必须把 VERSION 改掉，
  * 否则浏览器会一直用旧缓存。
  */
-const VERSION = '2.2.4';
+const VERSION = '2.4.2';
 const CACHE = 'beiming-reader-' + VERSION;
 
 const ASSETS = [
