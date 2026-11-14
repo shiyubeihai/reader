@@ -31,3 +31,39 @@
 
 每个字族拆成 3 个分片（unicode-range 划分），浏览器按需下载。
 未收录的生僻字会回退到系统字体。
+
+西文字体（2026-11-14 新增）
+===========================
+
+4. Literata（正文衬线，主力）
+   版权：Copyright 2017 The Literata Project Authors
+   许可：SIL Open Font License 1.1
+
+5. Newsreader（正文衬线）
+   版权：Copyright 2020 The Newsreader Project Authors
+   许可：SIL Open Font License 1.1
+   注意：不含西里尔子集，俄文会回退到宋体。
+
+6. Source Serif 4（学术感衬线）
+   版权：Copyright 2014-2023 Adobe (http://www.adobe.com/)
+   许可：SIL Open Font License 1.1
+
+7. PT Serif（备选衬线）
+   版权：Copyright 2010 ParaType Ltd (http://www.paratype.com/)
+   许可：SIL Open Font License 1.1
+
+8. PT Sans（无衬线）
+   版权：Copyright 2010 ParaType Ltd (http://www.paratype.com/)
+   许可：SIL Open Font License 1.1
+
+下载与裁剪
+----------
+以上 5 款西文字体从 Google Fonts 下载 woff2 子集，每款保留：
+
+- latin        基本拉丁（英、意、德、法的主要字母）
+- latin-ext    拉丁扩展（意大利语重音、东欧变音）
+- cyrillic     西里尔基本（俄语）
+- cyrillic-ext 西里尔扩展
+
+单款合计约 40-60KB。Newsreader 只有 latin 与 latin-ext。
+浏览器按 unicode-range 只下载实际用到的分片。

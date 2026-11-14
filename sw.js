@@ -3,7 +3,7 @@
  * 改了 index.html / 图标 / manifest 之后，必须把 VERSION 改掉，
  * 否则浏览器会一直用旧缓存。
  */
-const VERSION = '2.4.2';
+const VERSION = '2.4.3';
 const CACHE = 'beiming-reader-' + VERSION;
 
 const ASSETS = [
@@ -22,7 +22,13 @@ const ASSETS = [
   './fonts/sans-3.woff2',
   './fonts/round-1.woff2',
   './fonts/round-2.woff2',
-  './fonts/round-3.woff2'
+  './fonts/round-3.woff2',
+  /* 西文字体只预缓存最常用的拉丁子集，其余按需缓存 */
+  './fonts/lit-latin.woff2',
+  './fonts/new-latin.woff2',
+  './fonts/ss4-latin.woff2',
+  './fonts/pts-latin.woff2',
+  './fonts/ptn-latin.woff2'
 ];
 
 self.addEventListener('install', (event) => {
